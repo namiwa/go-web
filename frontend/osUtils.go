@@ -1,21 +1,25 @@
 package main
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
+	"path"
 )
 
-func validPath(path string) bool {
-  _, err := os.ReadDir(path)
-  if (err != nil) {
+func validPath(p string) bool {
+  cp := path.Clean(p)
+  _, err := os.ReadDir(cp)
+  if err != nil {
     infoLog("error reading dir path")
     return false
   }
   return true
 }
 
-func getFiles(path string) *[]fs.DirEntry {
-  files, _:= os.ReadDir(path)
+func getFiles(p string) *[]fs.DirEntry {
+  cp := path.Clean(p)
+  files, _ := os.ReadDir(cp)
   return &files
 }
 
@@ -27,11 +31,12 @@ func Map[T any, M any](vs []T, f func(T) M) []M {
   return vsm
 }
 
-func getFileNames(path string) []string {
-  if (!validPath(path)) {
+func getFileNames(p string) []string {
+  fmt.Print(validPath(p))
+  if !validPath(p) {
     return nil
   }
-  files := getFiles(path)
+  files := getFiles(p)
   return Map(*files, func(file fs.DirEntry) string {
     return file.Name()
   })
