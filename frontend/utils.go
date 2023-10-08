@@ -32,3 +32,14 @@ func Map[T any, M any](vs []T, f func(T) M) []M {
   return vsm
 }
 
+func Filter[T any](target []T, f func(T) bool) []T {
+    var store []T
+    for i, v := range target {
+        if (f(v)) {
+            store = append(store, target[i])
+        }
+    }
+    return store
+}
+
+
