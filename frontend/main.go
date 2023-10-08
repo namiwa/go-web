@@ -1,7 +1,8 @@
 package main
 
 import (
-  "os"
+	"fmt"
+	"os"
 )
 
 func main() {
@@ -20,8 +21,13 @@ func main() {
   if fileNames != nil {
     infoLog("managed to read files")
     logFromArray(fileNames)
-    traverseDir(*source, *target, func (t string) {
-      infoLog(t + "\n")
+    traverseDir(*source, *target, func (t string, info os.FileInfo, err error) error {
+      if err != nil {
+        return err
+      }
+      infoLog(t)
+      fmt.Println(info.IsDir())
+      return nil
     }, true)
     os.Exit(0)
   } else {

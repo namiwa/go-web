@@ -59,22 +59,17 @@ func replaceBaseExt(p string, ext string) string {
 
 func getDir(p string) string {
   cp := path.Clean(p)
-  return path.Base(cp)
+  return path.Dir(cp)
 }
 
+func makeDir(p string) {
+  cp := path.Clean(p)
+  os.MkdirAll(cp, fs.FileMode(0755))
+}
 
-func traverseDir(p string, t string, fn func(pt string), isRoot bool) {
+func traverseDir(p string, t string, fn func(pt string, info os.FileInfo, err error) error, isRoot bool) error {
   var cp = path.Clean(p)
-  entries, err := os.ReadDir(cp); if err != nil {
-    panic(err)
-  }
-  for _, entry := range entries {
-    entryName := path.Join(cp, entry.Name())
-    fn(entryName + " - " + getDir(cp))
-    if entry.IsDir() && (entry.Name() != "." || entry.Name() != "..") {
-      traverseDir(entryName, t, fn, false)
-    }
-  }
-
+  err := filepath.Walk(cp, fn)
+  return err
 }
 
