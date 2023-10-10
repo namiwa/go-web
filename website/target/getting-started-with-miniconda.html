@@ -1,0 +1,87 @@
+<h3 id="python">Python</h3>
+<p><a href="https://www.python.org/about/">Python</a> has been around for over 30 years, and remains one of the most popular<br />
+languages loved by businesses, researchers and hobbyist alike. It has a small,<br />
+simple syntax which easy to pick up by beginners, and extendible enough to create<br />
+tools tackling different domains, from battle-tested production websites to its<br />
+solid ecosystem of libraries and frameworks in machine learning and data science.</p>
+<p>Python is a great language to begin with for people who are starting out in their<br />
+programming journey. Personally, while the native Python downloads for Windows, MacOS<br />
+and Linux are sufficient for most applications, I think that using a dedicated Python<br />
+package manager will make it much easier to install specific binary tools and<br />
+packages which would otherwise require involved methods (like building such packages<br />
+from scratch) which would hamper one's speed in learning or using the language.</p>
+<h3 id="r">R</h3>
+<p><a href="https://www.r-project.org">R</a> was built with data science in mind. It function<br />
+is to make data analytics easier, and let users visualize their data transformations<br />
+easier and be able to run their analysis in real-time in the command line.<br />
+While my experience had only been limited to tidyverse and its related libraries,<br />
+it has a concise syntax where chaining operations on data is done in a much neater<br />
+way than in Python.</p>
+<h3 id="motivation">Motivation</h3>
+<p>Given my exposure to Python is more towards development work rather then data science<br />
+related and I had only briefly fiddled around with R, I do feel like both of these<br />
+languages shine when used in the right development environment. Which is why, if<br />
+possible, I would use a package manager to get started immediately with both languages.</p>
+<h3 id="introducing-miniconda">Introducing Miniconda</h3>
+<p><a href="http://anaconda.com">Anaconda</a> simplifies Python package management, where it not only<br />
+manages different virtual environments for Python, it also manages all the necessary<br />
+binaries that each package need as best as possible. What's more, this tool is<br />
+platform agnostic, so as long at the operating system is supported, it should work<br />
+and run the same across every platform!</p>
+<p>From my experience, using the full version of Anaconda along with its Graphical User<br />
+Interface (GUI) felt quite bloated, despite being able to meet all of my development needs.<br />
+Fortunately, they also release and maintain a stripped down Command Line Interface (CLI)<br />
+version where it only contains the core package manager with just the bare essential packages,<br />
+called <a href="https://docs.conda.io/en/latest/miniconda.html">Miniconda</a>.</p>
+<h3 id="installing-miniconda">Installing Miniconda</h3>
+<p>First, download the latest shell installer for Miniconda <a href="https://docs.conda.io/en/latest/miniconda.html#latest-miniconda-installer-links">here.</a><br />
+Follow the given instructions to verify that the script downloaded matches the hash published.</p>
+<p>After running the relevant <code>conda init</code> command for the terminal shell of choice<br />
+of your platform, you should be greeted with the following prompt in your terminal:</p>
+<p><img src="../images/getting-started-with-miniconda/miniconda-base.png" alt="conda base environment example" /></p>
+<p>The <code>(base)</code> next to the shell prompt indicates that miniconda is operating in its<br />
+default environment and that the initalization had been successful. Another way to<br />
+check would be to run <code>conda --version</code> which would give the following output:</p>
+<p><img src="../images/getting-started-with-miniconda/miniconda-version.png" alt="conda version" /></p>
+<h4 id="creating-python-environment">Creating Python environment</h4>
+<p>To get started with setting up a clean Python conda environment, run the following<br />
+commands in the terminal:</p>
+<ul>
+<li><code>conda create -n python-3-10 python=3.10</code>
+<ul>
+<li>Note that you are able to use any name, <code>python-3-10</code> is chosen for this example</li>
+</ul>
+</li>
+<li>Enter yes prompt</li>
+</ul>
+<p><img src="../images/getting-started-with-miniconda/miniconda-create-python-env.png" alt="conda create python env" /></p>
+<ul>
+<li><code>conda activate python-3-10</code><br />
+<img src="../images/getting-started-with-miniconda/miniconda-activate-python-env.png" alt="conda activate python env" /></li>
+</ul>
+<p>Running <code>python</code> or <code>which python</code> helpes to determine if the miniconda managed<br />
+python had been installed correctly:</p>
+<p><img src="../images/getting-started-with-miniconda/miniconda-check-python-env.png" alt="conda check python env" /></p>
+<h4 id="creating-r-environment">Creating R environment</h4>
+<p>To use R from miniconda, first exit out of any conda managed python environment<br />
+by running <code>conda deactivate</code></p>
+<ul>
+<li>
+<p>Create empty environment by running <code>conda create --name r_env</code>:<br />
+<img src="../images/getting-started-with-miniconda/miniconda-create-r.png" alt="conda create r environment" /></p>
+</li>
+<li>
+<p>Activate said environment (<code>conda activate r_env</code>) and install relevant R dependancies by running <code>conda install r r-essentials --channel conda-forge</code> and accepting downloads<br />
+<img src="../images/getting-started-with-miniconda/miniconda-after-install-r.png" alt="conda after install r environment" /></p>
+</li>
+<li>
+<p>The install from the previous command will take a couple minutes, so hang tight!</p>
+</li>
+<li>
+<p>To test if R install is correct, run the following <code>R --version</code>: <img src="../images/getting-started-with-miniconda/miniconda-r-version.png" alt="conda r version" /></p>
+</li>
+</ul>
+<h3 id="conclusion">Conclusion</h3>
+<p>With that, it should be possible to get started on any development work related to either<br />
+Python or R from miniconda! And the best part, this should work across major operating systems,<br />
+Windows, MacOS &amp; Linux :D</p>

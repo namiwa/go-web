@@ -67,8 +67,28 @@ func makeDir(p string) {
   os.MkdirAll(cp, fs.FileMode(0755))
 }
 
-func traverseDir(p string, t string, fn func(pt string, info os.FileInfo, err error) error, isRoot bool) error {
+func buildHtmlDirFromSource(p string, t string, isRoot bool) error {
   var cp = path.Clean(p)
+  var fn = func (pth string, file os.FileInfo, err error) error {
+    if err != nil {
+      infoLog(err, "something here")
+      return err
+    }
+    tp := path.Clean(t)
+    makeDir(tp)
+    base := path.Dir(path.Base(cp))
+    np := filepath.Join(tp, base, file.Name()) 
+    if file.IsDir() {
+      makeDir(np)
+      infoLog("ogSubDir: ", pth," subDir: ", np)
+    } else {
+      np := replaceBaseExt(np, "html")
+      os.Create(np)
+      infoLog("og: ", pth, " us: ", np)
+      writeHtmlFromMarkdown(pth, np)
+    }
+    return nil
+  }
   err := filepath.Walk(cp, fn)
   return err
 }

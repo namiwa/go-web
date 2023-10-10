@@ -34,7 +34,7 @@ func initMarkdownParser() func() goldmark.Markdown {
 var mdParser = initMarkdownParser()
 
 func parseMarkdownFile(p string) bytes.Buffer {
-    md := mdParser()
+  md := mdParser()
 	var buf bytes.Buffer
 	cp := path.Clean(p)
 	fileContent, err := os.ReadFile(cp)

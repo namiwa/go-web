@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -21,14 +20,7 @@ func main() {
   if fileNames != nil {
     infoLog("managed to read files")
     logFromArray(fileNames)
-    traverseDir(*source, *target, func (t string, info os.FileInfo, err error) error {
-      if err != nil {
-        return err
-      }
-      infoLog(t)
-      fmt.Println(info.IsDir())
-      return nil
-    }, true)
+    buildHtmlDirFromSource(*source, *target, true)
     os.Exit(0)
   } else {
     infoLog("failed to read files")
