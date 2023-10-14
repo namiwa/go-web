@@ -25,6 +25,7 @@ func startServer(p string) {
     if (page == nil) {
       return nil
     }
+    infoLog("adding page: ", *&page.Title)
     http.HandleFunc(*&page.Title, func (writer http.ResponseWriter, req *http.Request) {
       writer.Header().Set("Content-Type", "text/html; charset=utf-8")
       writer.Write(*&page.Body)
