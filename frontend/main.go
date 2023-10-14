@@ -4,14 +4,14 @@ import (
 	"os"
 )
 
-func main() {
+func build() {
   infoLog("Starting main markdown parser")
-  source := getFromArray(os.Args, 1)
+  source := getFromArray(os.Args, 2)
   if source == nil {
     infoLog("missing source directory")
     os.Exit(1)
   }
-  target := getFromArray(os.Args, 2)
+  target := getFromArray(os.Args, 3)
   if target == nil {
     infoLog("missing target directory")
     os.Exit(1)
@@ -27,3 +27,32 @@ func main() {
     os.Exit(1)
   }
 }
+
+func serve() {
+  infoLog("starting webserver")
+  target := getFromArray(os.Args, 2)
+  if target == nil {
+    infoLog("missing target directory")
+    os.Exit(1)
+  }
+  startServer(*target)
+  os.Exit(0)
+}
+
+func main() {
+  cmd := getFromArray(os.Args, 1)
+  switch (*cmd) {
+    case "build": {
+      build()
+    }
+    case "serve": {
+      serve()
+    }
+    default: {
+      infoLog("Error, unknown command", cmd)
+      os.Exit(1)
+    }
+  }
+}
+
+

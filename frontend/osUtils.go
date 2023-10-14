@@ -37,6 +37,18 @@ func getFileNames(p string) []string {
 	})
 }
 
+func getFilePages(p string) []*Page {
+  files := getFileNames(p)
+  return Map(files, func (file string) *Page {
+    data, err := os.ReadFile(file)
+    if err != nil {
+      return nil
+    }
+    title := strings.Replace(file, p, "", 1)
+    return &Page{Title: title, Body: data}
+  })
+}
+
 func writeToPath(buf bytes.Buffer, p string) {    
     cp := path.Clean(p)
     _, err := os.Stat(cp)
