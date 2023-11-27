@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"log"
 	"net/http"
+  "fmt"
 )
 
 /**
@@ -34,3 +36,38 @@ func startServer(p string) {
   })
   log.Fatal(http.ListenAndServe(":8080", nil))
 }
+
+type RawPage struct {
+  Buffer bytes.Buffer;
+  MetaData map[string]interface{};
+}
+
+func buildServer(p string) {
+  files := getFileNames(p)
+  data := Map(files, func (filename string) RawPage {
+    buf, metaData := parseMarkdownFile(filename)
+    return RawPage{
+      Buffer: buf,
+      MetaData: metaData,
+    }
+  })
+  for _, v := range data {
+    title := v.MetaData["title"]
+    date := v.MetaData["date"]
+    path := fmt.Sprint("/", v.MetaData["path"])
+    category := v.MetaData["category"]
+    if v.MetaData["path"] == nil {
+      infoLog("skipping as path is nill: ", path)
+      continue
+    }
+    infoLog("adding page: ", title, " path: ", path, " timestamp: ", date, "category: ", category)
+    http.HandleFunc(path, func (writer http.ResponseWriter, req *http.Request) {
+      infoLog(req.URL.Path, " visited")
+      writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+      writer.Write(v.Buffer.Bytes())
+    })
+  }
+
+  log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
