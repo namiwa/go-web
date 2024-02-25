@@ -2,9 +2,13 @@ package main
 
 import (
 	"bytes"
+	"context"
+	"fmt"
 	"log"
 	"net/http"
-  "fmt"
+	"os"
+	"os/signal"
+	"time"
 )
 
 /**
@@ -43,6 +47,28 @@ type RawPage struct {
 }
 
 func buildServer(p string) {
+  srv := &http.Server{
+    Addr: ":8080",
+    ReadTimeout: 10 * time.Second,
+    WriteTimeout: 10 * time.Second,
+    MaxHeaderBytes: 1 << 20,
+  }
+  idleConnsClosed := make(chan struct{})
+
+  go func() {
+    sigint := make(chan os.Signal, 1)
+    signal.Notify(sigint, os.Interrupt)
+    <-sigint
+
+    // we recieve interrupt, shutdown
+    if err := srv.Shutdown(context.Background()); err != nil {
+      // Err from closing listeners, or context timeout
+      infoLog(err)
+      infoLog("shutting down server")
+    }
+    close(idleConnsClosed)
+  }()
+
   files := getFileNames(p)
   data := Map(files, func (filename string) RawPage {
     buf, metaData := parseMarkdownFile(filename)
@@ -68,6 +94,11 @@ func buildServer(p string) {
     })
   }
 
-  log.Fatal(http.ListenAndServe(":8080", nil))
+  if err := srv.ListenAndServe(); err != nil {
+    infoLog("HTTP server listen and server: ")
+    infoLog(err)
+  }
+
+  <-idleConnsClosed
 }
 
