@@ -70,13 +70,15 @@ func buildServer(p string) {
   }()
 
   files := getFileNames(p)
-  data := Map(files, func (filename string) RawPage {
-    buf, metaData := parseMarkdownFile(filename)
-    return RawPage{
+  data := make([]RawPage, len(files))
+  for i, name := range files {
+    buf, metaData := parseMarkdownFile(name)
+    infoLog("debugging data loop", name, buf)
+    data[i] = RawPage{
       Buffer: buf,
       MetaData: metaData,
     }
-  })
+  }
   for _, v := range data {
     title := v.MetaData["title"]
     date := v.MetaData["date"]
