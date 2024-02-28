@@ -6,7 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path"
-	"path/filepath"
+  "path/filepath"
 	"strings"
 )
 
@@ -37,17 +37,34 @@ func getFileNames(p string) []string {
 	})
 }
 
-func getFilePages(p string) []*Page {
-  files := getFileNames(p)
-  return Map(files, func (file string) *Page {
-    data, err := os.ReadFile(file)
-    if err != nil {
-      infoLog("no data for path: ", file)
-      return nil
+/**
+* traverses all files & sub directories
+* TODO: insert injection markers for css / js here
+*/
+func getFilePages(p string, store *[]Page) {
+  pages := getFileNames(p)
+  if (len(pages) == 0) {
+    return 
+  }
+  for _, page := range(pages) {
+    infoLog("reading path: ", page)
+    stat, err := os.Stat(page); 
+    if err == nil && stat.IsDir() {
+      getFilePages(page, store)
+      continue
     }
-    title := strings.Replace(file, p, "", 1)
-    return &Page{Title: title, Body: data}
-  })
+    if (err != nil) {
+      infoLog("error reading subDir path: ", page)
+      continue
+    }
+    data, err := os.ReadFile(page); if err != nil {
+      infoLog("error reading file path: ", page)
+      continue
+    }
+    title := strings.Replace(page, p, "", 1)
+    *store = append(*store, Page{Title: title, Body: data})
+  }
+  return
 }
 
 func writeToPath(buf bytes.Buffer, p string) {    
@@ -70,9 +87,10 @@ func replaceBaseExt(p string, ext string) string {
     return strings.Join([]string{name, ".", ext}, "")
 }
 
-func getDir(p string) string {
+func isDir(p string) bool {
   cp := path.Clean(p)
-  return path.Dir(cp)
+  stat, err := os.Stat(cp);
+  return err == nil && stat.IsDir()
 }
 
 func makeDir(p string) {
@@ -81,28 +99,45 @@ func makeDir(p string) {
 }
 
 func buildHtmlDirFromSource(p string, t string, isRoot bool) error {
-  var cp = path.Clean(p)
-  var fn = func (pth string, file os.FileInfo, err error) error {
-    if err != nil {
-      infoLog(err, "something here")
+  source := path.Clean(p)
+  target := path.Clean(t)
+  isValidSource := isDir(source)
+  isValidTarget := isDir(target)
+  if (!isValidSource) {
+    return errors.New("source must be a valid directory")
+  }
+
+  if (!isValidTarget) {
+    makeDir(target)
+  } else {
+
+  err := os.RemoveAll(target)
+    if (err != nil) {
       return err
     }
-    tp := path.Clean(t)
-    makeDir(tp)
-    base := path.Dir(path.Base(cp))
-    np := filepath.Join(tp, base, file.Name()) 
-    if file.IsDir() {
-      makeDir(np)
-      infoLog("ogSubDir: ", pth," subDir: ", np)
-    } else {
-      np := replaceBaseExt(np, "html")
-      os.Create(np)
-      infoLog("og: ", pth, " us: ", np)
-      writeHtmlFromMarkdown(pth, np)
-    }
-    return nil
+    makeDir(target)
   }
-  err := filepath.Walk(cp, fn)
-  return err
+  
+  filesAndDirs := getFileNames(source)
+  for _, fileOrDir := range(filesAndDirs) {
+    targetPath := strings.Replace(fileOrDir, source, target, 1)
+    infoLog("diff files", fileOrDir, targetPath)
+    if (isDir(fileOrDir)) {
+      makeDir(targetPath)
+      err := buildHtmlDirFromSource(fileOrDir, targetPath, false)
+      if (err != nil) {
+        infoLog("failed to target subDir: ", fileOrDir, " error: ", err)
+      } 
+    } else {
+      if (filepath.Ext(fileOrDir) == ".md" || filepath.Ext(fileOrDir) == ".MD") {
+        np := replaceBaseExt(targetPath, "html")
+        if (!validPath(np)) {
+          os.Create(np)
+        }
+        writeHtmlFromMarkdown(fileOrDir, np)
+      } 
+    }
+  }
+  return nil
 }
 

@@ -12,7 +12,6 @@ generator.
 For version 1, the aim would be to have the following:
 
 * A single binary as a command line tool to parse markdown files and output html
-    * [x] ensure that only single level build is supported
     * [ ] simple templated index page
     * [ ] global injection for css / js
     * [ ] custom override for single page css
@@ -21,6 +20,11 @@ For version 1, the aim would be to have the following:
     * [x] two stage build, parse target dir to markdown
     * [x] serves via native go http package
     * [ ] add local filewatcher for hot-reload
+
+## BUGS
+
+* [ ] dev serve serves EVERYTHING in target path...
+* [x] fix recursion directory and file traversal 
 
 ## Usage
 

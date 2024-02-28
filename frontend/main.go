@@ -16,11 +16,9 @@ func build() {
     infoLog("missing target directory")
     os.Exit(1)
   }
-  fileNames := getFileNames(*source)
-  if fileNames != nil {
-    infoLog("managed to read files")
-    logFromArray(fileNames)
-    buildHtmlDirFromSource(*source, *target, true)
+  err := buildHtmlDirFromSource(*source, *target, true)
+  if err == nil {
+    infoLog("successfully converted markdown to html")
     os.Exit(0)
   } else {
     infoLog("failed to read files")
