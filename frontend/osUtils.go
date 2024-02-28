@@ -42,6 +42,7 @@ func getFilePages(p string) []*Page {
   return Map(files, func (file string) *Page {
     data, err := os.ReadFile(file)
     if err != nil {
+      infoLog("no data for path: ", file)
       return nil
     }
     title := strings.Replace(file, p, "", 1)
