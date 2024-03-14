@@ -15,15 +15,15 @@ import (
 func initMarkdownParser() func() goldmark.Markdown {
 	md := goldmark.New(
 		goldmark.WithExtensions(
-            extension.GFM,
-            meta.Meta,
-        ),
+			extension.GFM,
+			meta.Meta,
+		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
 		),
 		goldmark.WithRendererOptions(
 			html.WithHardWraps(),
-      html.WithXHTML(),
+			html.WithXHTML(),
 		),
 	)
 	return func() goldmark.Markdown {
@@ -34,32 +34,31 @@ func initMarkdownParser() func() goldmark.Markdown {
 var mdParser = initMarkdownParser()
 
 func parseMarkdownFile(p string) (bytes.Buffer, map[string]interface{}) {
-  md := mdParser()
+	md := mdParser()
 	var buf bytes.Buffer
-  context := parser.NewContext()
+	context := parser.NewContext()
 	cp := path.Clean(p)
 	fileContent, err := os.ReadFile(cp)
 	if err != nil {
-    infoLog("parseMarkdownFile: failed to read file: " + cp)
+		infoLog("parseMarkdownFile: failed to read file: " + cp)
 	}
 	if err := md.Convert(fileContent, &buf, parser.WithContext(context)); err != nil {
-    panic(err)
+		panic(err)
 	}
-  metaData := meta.Get(context)
-  infoLog("parseMarkdownFile: ", metaData)
+	metaData := meta.Get(context)
+	infoLog("parseMarkdownFile: ", metaData)
 	return buf, metaData
 }
 
 func writeHtmlFromMarkdown(p string, t string) {
-    buf, _ := parseMarkdownFile(p)
-    ct := path.Clean(t)
-    writeToPath(buf, ct)
+	buf, _ := parseMarkdownFile(p)
+	ct := path.Clean(t)
+	writeToPath(buf, ct)
 }
 
 func convertMarkdownFilesToHtml(paths []string) {
-    for _, p := range paths {
-        target := replaceBaseExt(p, "html")
-        writeHtmlFromMarkdown(p, target)
-    }
+	for _, p := range paths {
+		target := replaceBaseExt(p, "html")
+		writeHtmlFromMarkdown(p, target)
+	}
 }
-

@@ -1,10 +1,9 @@
-package main 
+package main
 
-import "log";
+import "log"
 
 var logger = log.Default()
 
 func infoLog(msg ...any) {
-  logger.Println(msg...)
+	logger.Println(msg...)
 }
-
