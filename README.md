@@ -23,6 +23,8 @@ For version 1, the aim would be to have the following:
 
 ## BUGS
 
+- [ ] buildServe freezes the last item in memory, shows the same page despite different routes
+- [ ] fsnotify does not seem to restart webserver (doesn't work on windows so far)
 - [ ] dev serve serves EVERYTHING in target path...
 - [x] fix recursion directory and file traversal
 
