@@ -65,7 +65,6 @@ func getFilePages(p string, store *[]Page) {
 		title := strings.Replace(page, p, "", 1)
 		*store = append(*store, Page{Title: title, Body: data})
 	}
-	return
 }
 
 func writeToPath(buf bytes.Buffer, p string) {
