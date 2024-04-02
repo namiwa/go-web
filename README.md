@@ -2,9 +2,9 @@
 
 A simple way to write static blog sites using markdown, written in Golang.
 
-This was done to reduce fatigue writing static sites using only JavaScript or  
-TypeScript based frameworks. Hugo exist to solve this problem, but I want to
-to do something from scratch to really understand how a simple static site
+This was done to reduce fatigue writing static sites using only JavaScript or TypeScript based frameworks.
+
+Hugo exist to solve this problem, but I want to to do something from scratch to really understand how a simple static site
 generator.
 
 ## Roadmap
