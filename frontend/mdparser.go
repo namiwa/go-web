@@ -55,10 +55,3 @@ func writeHtmlFromMarkdown(p string, t string) {
 	ct := path.Clean(t)
 	writeToPath(buf, ct)
 }
-
-func convertMarkdownFilesToHtml(paths []string) {
-	for _, p := range paths {
-		target := replaceBaseExt(p, "html")
-		writeHtmlFromMarkdown(p, target)
-	}
-}
