@@ -7,7 +7,7 @@ import (
 
 func build(source *string, target *string) {
 	infoLog("Starting main markdown parser")
-	err := buildHtmlDirFromSource(*source, *target, true)
+	err := buildHtmlDirFromSource(*source, *target)
 	if err == nil {
 		infoLog("successfully converted markdown to html")
 		os.Exit(0)
