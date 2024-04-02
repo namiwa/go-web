@@ -38,7 +38,7 @@ type Page struct {
 	Body  []byte
 }
 
-func startServer(p string) {
+func startServer(p string) *http.Server {
 	srv := &http.Server{
 		Addr:           ":8080",
 		ReadTimeout:    10 * time.Second,
@@ -65,6 +65,8 @@ func startServer(p string) {
 	}
 
 	<-idleConnsClosed
+
+	return srv
 }
 
 type RawPage struct {

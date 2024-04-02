@@ -71,6 +71,14 @@ func main() {
 			}
 			buildServe(target)
 		}
+	case "dev":
+		{
+			if *target == "" {
+				infoLog("empty target directory")
+				os.Exit(1)
+			}
+			watchDir(*target, startServer)
+		}
 	default:
 		{
 			infoLog("Error, unknown command", cmd)
