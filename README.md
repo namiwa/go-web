@@ -28,6 +28,8 @@ For version 1, the aim would be to have the following:
 
 ## Usage
 
+Enter frontend folder, with go version 1.22 minimally, and run `go build`, this should execute a frontend binary file.
+
 - building: `./frontend -cmd=build -source=<target_markdown_folder> -target=<output_folder>`
 - serving: `./frontend serve -target=<output_folder>` (only serves html for now)
 
