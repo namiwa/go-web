@@ -1,25 +1,5 @@
 package main
 
-func getFromArray[T any](array []T, index int) *T {
-	if len(array) <= index {
-		return nil
-	} else {
-		return &array[index]
-	}
-}
-
-func logFromArray[T any](array []T) {
-	n := len(array)
-	if n == 0 {
-		infoLog("Array is empty")
-	} else {
-		infoLog("Printing array")
-		for ind, elem := range array {
-			infoLog("elem: ", ind, " value: ", elem)
-		}
-	}
-}
-
 func Map[T any, M any](vs []T, f func(T) M) []M {
 	vsm := make([]M, len(vs))
 	for i, v := range vs {

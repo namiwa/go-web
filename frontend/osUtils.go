@@ -65,7 +65,6 @@ func getFilePages(p string, store *[]Page) {
 		title := strings.Replace(page, p, "", 1)
 		*store = append(*store, Page{Title: title, Body: data})
 	}
-	return
 }
 
 func writeToPath(buf bytes.Buffer, p string) {
@@ -99,7 +98,7 @@ func makeDir(p string) {
 	os.MkdirAll(cp, fs.FileMode(0755))
 }
 
-func buildHtmlDirFromSource(p string, t string, isRoot bool) error {
+func buildHtmlDirFromSource(p string, t string) error {
 	source := path.Clean(p)
 	target := path.Clean(t)
 	isValidSource := isDir(source)
@@ -125,7 +124,7 @@ func buildHtmlDirFromSource(p string, t string, isRoot bool) error {
 		infoLog("diff files", fileOrDir, targetPath)
 		if isDir(fileOrDir) {
 			makeDir(targetPath)
-			err := buildHtmlDirFromSource(fileOrDir, targetPath, false)
+			err := buildHtmlDirFromSource(fileOrDir, targetPath)
 			if err != nil {
 				infoLog("failed to target subDir: ", fileOrDir, " error: ", err)
 			}

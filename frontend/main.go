@@ -7,7 +7,7 @@ import (
 
 func build(source *string, target *string) {
 	infoLog("Starting main markdown parser")
-	err := buildHtmlDirFromSource(*source, *target, true)
+	err := buildHtmlDirFromSource(*source, *target)
 	if err == nil {
 		infoLog("successfully converted markdown to html")
 		os.Exit(0)
@@ -23,7 +23,7 @@ func serve(target *string) {
 		infoLog("empty target directory")
 		os.Exit(1)
 	}
-	startServer(*target)
+	startServer(*target, true)
 	os.Exit(0)
 }
 
@@ -33,7 +33,7 @@ func buildServe(target *string) {
 		infoLog("empty target directory")
 		os.Exit(1)
 	}
-	buildServer(*target)
+	buildServer(*target, true)
 	os.Exit(0)
 }
 
@@ -70,6 +70,22 @@ func main() {
 				os.Exit(1)
 			}
 			buildServe(target)
+		}
+	case "devStart":
+		{
+			if *target == "" {
+				infoLog("empty target directory")
+				os.Exit(1)
+			}
+			watchDir(*target, startServer)
+		}
+	case "devServe":
+		{
+			if *target == "" {
+				infoLog("empty target directory")
+				os.Exit(1)
+			}
+			watchDir(*target, buildServer)
 		}
 	default:
 		{
