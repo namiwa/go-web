@@ -1,30 +1,59 @@
 package main
 
 import (
-	"context"
+	"log"
 	"net/http"
 	"os"
+	"os/signal"
 
 	"github.com/fsnotify/fsnotify"
 )
 
-func watchDir(p string, f func(p string) *http.Server) {
+func sendWatchShutdown(connClosed chan struct{}) {
+	sigint := make(chan os.Signal, 1)
+	signal.Notify(sigint, os.Interrupt)
+	<-sigint
+	infoLog("shutting down file watcher")
+	close(connClosed)
+}
+
+func watchDir(p string, f func(p string, start bool) *http.Server) {
 	infoLog("starting file watcher")
 	if !isDir(p) {
 		infoLog("invalid directory", p)
 		os.Exit(1)
 	}
 	infoLog("using valid directory")
+
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		infoLog(err)
+		log.Fatal(err, "watcher error")
 		os.Exit(1)
 	}
 	defer watcher.Close()
 
-	server := f(p)
+	connClosed := make(chan struct{})
+	go sendWatchShutdown(connClosed)
 
-	// listen for events
+	serverChannel := make(chan *http.Server, 1)
+	restartChannel := make(chan bool, 1)
+	go func() {
+		var svr *http.Server
+		for restart := range restartChannel {
+			if restart {
+				if svr != nil {
+					shutdownServer(svr)
+				}
+			}
+			svr = f(p, false)
+			infoLog("starting server")
+			serverChannel <- svr
+			infoLog("end of goroutine loop")
+			svr.ListenAndServe()
+		}
+	}()
+
+	restartChannel <- false
 	go func() {
 		for {
 			select {
@@ -35,26 +64,24 @@ func watchDir(p string, f func(p string) *http.Server) {
 				infoLog("event:", event)
 				if event.Has(fsnotify.Write) {
 					infoLog("modified file: ", event.Name)
-					// shutdown existing server
-					if err := server.Shutdown(context.Background()); err != nil {
-						// Err from closing listeners, or context timeout
-						infoLog(err)
-						infoLog("shutting down server")
-					}
-					server = f(p)
+					svr := <-serverChannel
+					shutdownServer(svr)
+					restartChannel <- true
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return
 				}
-				infoLog("error: ", err)
+				log.Fatal(err)
 			}
 		}
 	}()
 
 	err = watcher.Add(p)
 	if err != nil {
-		infoLog(err)
+		log.Fatal(err, "watcher add error")
 		os.Exit(1)
 	}
+
+	<-connClosed
 }

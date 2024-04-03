@@ -23,7 +23,7 @@ func serve(target *string) {
 		infoLog("empty target directory")
 		os.Exit(1)
 	}
-	startServer(*target)
+	startServer(*target, true)
 	os.Exit(0)
 }
 
@@ -33,7 +33,7 @@ func buildServe(target *string) {
 		infoLog("empty target directory")
 		os.Exit(1)
 	}
-	buildServer(*target)
+	buildServer(*target, true)
 	os.Exit(0)
 }
 
@@ -71,13 +71,21 @@ func main() {
 			}
 			buildServe(target)
 		}
-	case "dev":
+	case "devStart":
 		{
 			if *target == "" {
 				infoLog("empty target directory")
 				os.Exit(1)
 			}
 			watchDir(*target, startServer)
+		}
+	case "devServe":
+		{
+			if *target == "" {
+				infoLog("empty target directory")
+				os.Exit(1)
+			}
+			watchDir(*target, buildServer)
 		}
 	default:
 		{

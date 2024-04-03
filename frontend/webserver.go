@@ -18,17 +18,15 @@ account for 404 / missing pages
 look out for refresh, file watching
 */
 
+func shutdownServer(srv *http.Server) error {
+	return srv.Shutdown(context.Background())
+}
+
 func sendServerShutdown(srv *http.Server, idleConnsClosed chan struct{}) {
 	sigint := make(chan os.Signal, 1)
 	signal.Notify(sigint, os.Interrupt)
 	<-sigint
-
-	// we recieve interrupt, shutdown
-	if err := srv.Shutdown(context.Background()); err != nil {
-		// Err from closing listeners, or context timeout
-		infoLog(err)
-		infoLog("shutting down server")
-	}
+	shutdownServer(srv)
 	close(idleConnsClosed)
 }
 
@@ -38,33 +36,35 @@ type Page struct {
 	Body  []byte
 }
 
-func startServer(p string) *http.Server {
-	srv := &http.Server{
-		Addr:           ":8080",
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-	}
-	idleConnsClosed := make(chan struct{})
+func startServer(p string, start bool) *http.Server {
+	infoLog("param values", p, start)
+	mux := http.NewServeMux()
 
-	go sendServerShutdown(srv, idleConnsClosed)
 	var pages []Page
 	getFilePages(p, &pages)
 	Map(pages, func(page Page) Page {
-		infoLog("adding page: ", page.Title)
-		http.HandleFunc(page.Title, func(writer http.ResponseWriter, req *http.Request) {
+		infoLog("adding handler page: ", page.Title)
+		mux.HandleFunc(page.Title, func(writer http.ResponseWriter, req *http.Request) {
 			writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 			writer.Write(page.Body)
 		})
 		return page
 	})
 
-	if err := srv.ListenAndServe(); err != nil {
-		infoLog("HTTP server listen and server: ")
-		infoLog(err)
+	srv := &http.Server{
+		Addr:           ":8080",
+		Handler:        mux,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
 	}
 
-	<-idleConnsClosed
+	if start {
+		err := srv.ListenAndServe()
+		if err != nil {
+			infoLog("default startServer closed")
+		}
+	}
 
 	return srv
 }
@@ -74,16 +74,9 @@ type RawPage struct {
 	MetaData map[string]interface{}
 }
 
-func buildServer(p string) {
-	srv := &http.Server{
-		Addr:           ":8080",
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-	}
+func buildServer(p string, start bool) *http.Server {
+	mux := http.NewServeMux()
 	idleConnsClosed := make(chan struct{})
-
-	go sendServerShutdown(srv, idleConnsClosed)
 
 	files := getFileNames(p)
 	data := make([]RawPage, len(files))
@@ -105,17 +98,28 @@ func buildServer(p string) {
 			continue
 		}
 		infoLog("buildServer: adding page: ", title, " path: ", path, " timestamp: ", date, "category: ", category)
-		http.HandleFunc(path, func(writer http.ResponseWriter, req *http.Request) {
+		mux.HandleFunc(path, func(writer http.ResponseWriter, req *http.Request) {
 			infoLog(req.URL.Path, " visited")
 			writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 			writer.Write(v.Buffer.Bytes())
 		})
 	}
 
-	if err := srv.ListenAndServe(); err != nil {
-		infoLog("HTTP server listen and server: ")
-		infoLog(err)
+	srv := &http.Server{
+		Addr:           ":8080",
+		Handler:        mux,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+	go sendServerShutdown(srv, idleConnsClosed)
+
+	if start {
+		err := srv.ListenAndServe()
+		if err != nil {
+			infoLog("default buildServer closed")
+		}
 	}
 
-	<-idleConnsClosed
+	return srv
 }
