@@ -39,12 +39,7 @@ func watchDir(p string, f func(p string, start bool) *http.Server) {
 	restartChannel := make(chan bool, 1)
 	go func() {
 		var svr *http.Server
-		for restart := range restartChannel {
-			if restart {
-				if svr != nil {
-					shutdownServer(svr)
-				}
-			}
+		for range restartChannel {
 			svr = f(p, false)
 			infoLog("starting server")
 			serverChannel <- svr
@@ -64,8 +59,7 @@ func watchDir(p string, f func(p string, start bool) *http.Server) {
 				infoLog("event:", event)
 				if event.Has(fsnotify.Write) {
 					infoLog("modified file: ", event.Name)
-					svr := <-serverChannel
-					shutdownServer(svr)
+					shutdownServer(<-serverChannel)
 					restartChannel <- true
 				}
 			case err, ok := <-watcher.Errors:
