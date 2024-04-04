@@ -19,12 +19,12 @@ For version 1, the aim would be to have the following:
 - Dev server for listening / registering file changes from the MarkDown files
   - [x] two stage build, parse target dir to markdown
   - [x] serves via native go http package
-  - [ ] add local filewatcher for hot-reload
+  - [x] add local filewatcher for hot-reload
 
 ## BUGS
 
-- [ ] buildServe freezes the last item in memory, shows the same page despite different routes
-- [ ] fsnotify does not seem to restart webserver (doesn't work on windows so far)
+- [x] buildServe freezes the last item in memory, shows the same page despite different routes (did not handle loop closure in range)
+- [x] fsnotify does not seem to restart webserver (windows file saved as write, macos shows rename / create so reload fails, linux untested) 
 - [ ] dev serve serves EVERYTHING in target path...
 - [x] fix recursion directory and file traversal
 
@@ -34,7 +34,8 @@ Enter frontend folder, with go version 1.22 minimally, and run `go build`, this 
 
 - building: `./frontend -cmd=build -source=<target_markdown_folder> -target=<output_folder>`
 - serving: `./frontend serve -target=<output_folder>` (only serves html for now)
+- watch serve: `./frontend --cmd devStart --target ../website/blog`
+- watch build: `./frontend --cmd devServe --target ../website/blog`
 
 notes:
-
 - public directory is always ignored in this repo
