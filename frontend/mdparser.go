@@ -33,9 +33,9 @@ func initMarkdownParser() func() goldmark.Markdown {
 
 var mdParser = initMarkdownParser()
 
-func parseMarkdownFile(p string) (bytes.Buffer, map[string]interface{}) {
+func parseMarkdownFile(p string) (*bytes.Buffer, map[string]interface{}) {
 	md := mdParser()
-	var buf bytes.Buffer
+	buf := bytes.Buffer{}
 	context := parser.NewContext()
 	cp := path.Clean(p)
 	fileContent, err := os.ReadFile(cp)
@@ -47,11 +47,12 @@ func parseMarkdownFile(p string) (bytes.Buffer, map[string]interface{}) {
 	}
 	metaData := meta.Get(context)
 	infoLog("parseMarkdownFile: ", metaData)
-	return buf, metaData
+
+	return &buf, metaData
 }
 
 func writeHtmlFromMarkdown(p string, t string) {
 	buf, _ := parseMarkdownFile(p)
 	ct := path.Clean(t)
-	writeToPath(buf, ct)
+	writeToPath(*buf, ct)
 }

@@ -19,6 +19,10 @@ look out for refresh, file watching
 */
 
 func shutdownServer(srv *http.Server) error {
+	infoLog("starting server shutdown")
+	if srv == nil {
+		return fmt.Errorf("server instance is nil")
+	}
 	return srv.Shutdown(context.Background())
 }
 
@@ -27,6 +31,7 @@ func sendServerShutdown(srv *http.Server, idleConnsClosed chan struct{}) {
 	signal.Notify(sigint, os.Interrupt)
 	<-sigint
 	shutdownServer(srv)
+	infoLog("server shutdown success")
 	close(idleConnsClosed)
 }
 
@@ -62,6 +67,7 @@ func startServer(p string, start bool) *http.Server {
 	if start {
 		err := srv.ListenAndServe()
 		if err != nil {
+			logger.Println(err)
 			infoLog("default startServer closed")
 		}
 	}
@@ -82,22 +88,30 @@ func buildServer(p string, start bool) *http.Server {
 	data := make([]RawPage, len(files))
 	for i, name := range files {
 		buf, metaData := parseMarkdownFile(name)
-		infoLog("buildServer: dataloop - ", name, buf)
+		infoLog("buildServer: name, bufSize ", name, buf.Len())
 		data[i] = RawPage{
-			Buffer:   buf,
+			Buffer:   *buf,
 			MetaData: metaData,
 		}
 	}
+	// bug is due to the handle func being called in a closure
 	for _, v := range data {
+		v := v
+		if v.MetaData["path"] == nil {
+			infoLog("buildServer: skipping as path is nill: ", v.MetaData)
+			continue
+		}
 		title := v.MetaData["title"]
 		date := v.MetaData["date"]
 		path := fmt.Sprint("/", v.MetaData["path"])
 		category := v.MetaData["category"]
-		if v.MetaData["path"] == nil {
-			infoLog("buildServer: skipping as path is nill: ", path)
-			continue
-		}
-		infoLog("buildServer: adding page: ", title, " path: ", path, " timestamp: ", date, "category: ", category)
+		infoLog(
+			"buildServer: adding page: ", title,
+			" path: ", path,
+			" timestamp: ", date,
+			"category: ", category,
+			"buffSize:", v.Buffer.Len(),
+		)
 		mux.HandleFunc(path, func(writer http.ResponseWriter, req *http.Request) {
 			infoLog(req.URL.Path, " visited")
 			writer.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -117,6 +131,7 @@ func buildServer(p string, start bool) *http.Server {
 	if start {
 		err := srv.ListenAndServe()
 		if err != nil {
+			logger.Println(err)
 			infoLog("default buildServer closed")
 		}
 	}
