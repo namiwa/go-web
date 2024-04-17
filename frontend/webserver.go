@@ -67,8 +67,7 @@ func startServer(p string, start bool) *http.Server {
 	if start {
 		err := srv.ListenAndServe()
 		if err != nil {
-			logger.Println(err)
-			infoLog("default startServer closed")
+			infoLog("default startServer closed: ", err)
 		}
 	}
 
@@ -131,8 +130,7 @@ func buildServer(p string, start bool) *http.Server {
 	if start {
 		err := srv.ListenAndServe()
 		if err != nil {
-			logger.Println(err)
-			infoLog("default buildServer closed")
+			infoLog("default buildServer closed: ", err)
 		}
 	}
 

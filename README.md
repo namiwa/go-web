@@ -20,11 +20,12 @@ For version 1, the aim would be to have the following:
   - [x] two stage build, parse target dir to markdown
   - [x] serves via native go http package
   - [x] add local filewatcher for hot-reload
+  - [ ] unit & integration testing
 
 ## BUGS
 
 - [x] buildServe freezes the last item in memory, shows the same page despite different routes (did not handle loop closure in range)
-- [x] fsnotify does not seem to restart webserver (windows file saved as write, macos shows rename / create so reload fails, linux untested) 
+- [x] fsnotify does not seem to restart webserver (windows file saved as write, macos shows rename / create so reload fails, linux untested)
 - [ ] dev serve serves EVERYTHING in target path...
 - [x] fix recursion directory and file traversal
 
@@ -37,5 +38,12 @@ Enter frontend folder, with go version 1.22 minimally, and run `go build`, this 
 - watch serve: `./frontend --cmd devStart --target ../website/blog`
 - watch build: `./frontend --cmd devServe --target ../website/blog`
 
-notes:
-- public directory is always ignored in this repo
+## Notes
+
+- public directory is always ignored in this rep
+
+## References
+
+- testing
+  - https://pkg.go.dev/github.com/stretchr/testify/assert
+  - https://stackoverflow.com/questions/10516662/how-to-measure-test-coverage-in-go

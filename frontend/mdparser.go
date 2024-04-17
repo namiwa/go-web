@@ -40,9 +40,11 @@ func parseMarkdownFile(p string) (*bytes.Buffer, map[string]interface{}) {
 	cp := path.Clean(p)
 	fileContent, err := os.ReadFile(cp)
 	if err != nil {
-		infoLog("parseMarkdownFile: failed to read file: " + cp)
+		infoLog(err)
+		panic(err)
 	}
 	if err := md.Convert(fileContent, &buf, parser.WithContext(context)); err != nil {
+		infoLog(err)
 		panic(err)
 	}
 	metaData := meta.Get(context)
