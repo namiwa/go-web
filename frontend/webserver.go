@@ -87,6 +87,10 @@ func buildServer(p string, start bool) *http.Server {
 	data := make([]RawPage, len(files))
 	for i, name := range files {
 		buf, metaData := parseMarkdownFile(name)
+		if buf == nil {
+			infoLog("skipping ", name, " as it contains invalid html output")
+			continue
+		}
 		infoLog("buildServer: name, bufSize ", name, buf.Len())
 		data[i] = RawPage{
 			Buffer:   *buf,

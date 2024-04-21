@@ -2,8 +2,11 @@ package main
 
 import (
 	"bytes"
+	"encoding/xml"
+	"io"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/yuin/goldmark"
 	meta "github.com/yuin/goldmark-meta"
@@ -11,6 +14,34 @@ import (
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 )
+
+func validateHtml(data *bytes.Buffer) bool {
+	if data == nil {
+		return false
+	}
+
+	// https://stackoverflow.com/a/52410528/13941170
+	r := strings.NewReader(data.String())
+	d := xml.NewDecoder(r)
+
+	result := true
+
+	d.Strict = false
+	d.AutoClose = xml.HTMLAutoClose
+	d.Entity = xml.HTMLEntity
+	for {
+		_, err := d.Token()
+		switch err {
+		case io.EOF:
+			return result
+		case nil:
+		default:
+			infoLog(err)
+			return false
+		}
+	}
+
+}
 
 func initMarkdownParser() func() goldmark.Markdown {
 	md := goldmark.New(
@@ -44,11 +75,15 @@ func parseMarkdownFile(p string) (*bytes.Buffer, map[string]interface{}) {
 		panic(err)
 	}
 	if err := md.Convert(fileContent, &buf, parser.WithContext(context)); err != nil {
+		// Seems to be quite hard to trigger this error
 		infoLog(err)
 		panic(err)
 	}
 	metaData := meta.Get(context)
 	infoLog("parseMarkdownFile: ", metaData)
+	if !validateHtml(&buf) {
+		return nil, metaData
+	}
 
 	return &buf, metaData
 }

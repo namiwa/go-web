@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -38,12 +40,29 @@ func TestParseMarkdownCorrect(t *testing.T) {
 	assert.NotZero(t, len(buf.Bytes()))
 }
 
-func TestParseMarkdownMissingFilePanic(t *testing.T) {
-	testFailurePath := "./fixtures/dont_exists.md"
-	assert.Panics(t, func() { parseMarkdownFile(testFailurePath) })
+func TestWriteHtmlFromMarkdown(t *testing.T) {
+	resultPath := "./fixtures/results.html"
+	testPath := "./fixtures/markdown_test.md"
+	writeHtmlFromMarkdown(testPath, resultPath)
+	resultsFile, err := os.ReadFile(resultPath)
+	assert.Nil(t, err)
+	referenceFile, err := os.ReadFile("./fixtures/markdown_test.html")
+	assert.Nil(t, err)
+	assert.Equal(
+		t,
+		string(resultsFile),
+		strings.ReplaceAll(string(referenceFile), "\r", ""), // windows carriage return removal
+	)
+	defer os.Remove(resultPath)
 }
 
-func SkipTestParseMardownInvalidFilePanic(t *testing.T) {
-	testInvalidPath := "./fixtures/markdown_invalid_test.md"
-	assert.Panics(t, func() { parseMarkdownFile(testInvalidPath) })
+func TestParseMarkdownMissingFilePanic(t *testing.T) {
+	testMissingPath := "./fixtures/dont_exists.md"
+	assert.Panics(t, func() { parseMarkdownFile(testMissingPath) })
+}
+
+func TestParseMardownInvalidFilePanic(t *testing.T) {
+	testImageFile := "./fixtures/invalid_markdown.png"
+	buf, _ := parseMarkdownFile(testImageFile)
+	assert.Nil(t, buf)
 }

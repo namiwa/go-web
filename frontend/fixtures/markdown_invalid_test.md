@@ -2,9 +2,6 @@
     test: fail
 --
 
+[]!()
 
-/test*<
-
-```javascript
-    var x = 1;
-``
+</p>broken html<p>

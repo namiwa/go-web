@@ -16,6 +16,7 @@ For version 1, the aim would be to have the following:
   - [ ] global injection for css / js
   - [ ] custom override for single page css
   - [ ] templating fragments of headers / footers
+  - [ ] easy seo integration
 - Dev server for listening / registering file changes from the MarkDown files
   - [x] two stage build, parse target dir to markdown
   - [x] serves via native go http package
