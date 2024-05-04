@@ -67,8 +67,7 @@ func startServer(p string, start bool) *http.Server {
 	if start {
 		err := srv.ListenAndServe()
 		if err != nil {
-			logger.Println(err)
-			infoLog("default startServer closed")
+			infoLog("default startServer closed: ", err)
 		}
 	}
 
@@ -88,6 +87,10 @@ func buildServer(p string, start bool) *http.Server {
 	data := make([]RawPage, len(files))
 	for i, name := range files {
 		buf, metaData := parseMarkdownFile(name)
+		if buf == nil {
+			infoLog("skipping ", name, " as it contains invalid html output")
+			continue
+		}
 		infoLog("buildServer: name, bufSize ", name, buf.Len())
 		data[i] = RawPage{
 			Buffer:   *buf,
@@ -131,8 +134,7 @@ func buildServer(p string, start bool) *http.Server {
 	if start {
 		err := srv.ListenAndServe()
 		if err != nil {
-			logger.Println(err)
-			infoLog("default buildServer closed")
+			infoLog("default buildServer closed: ", err)
 		}
 	}
 
