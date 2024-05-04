@@ -81,11 +81,11 @@ func parseMarkdownFile(p string) (*bytes.Buffer, map[string]interface{}) {
 	}
 	metaData := meta.Get(context)
 	infoLog("parseMarkdownFile: ", metaData)
-	if !validateHtml(&buf) {
+	buff := injectCssReset(&buf)
+	if !validateHtml(buff) {
 		return nil, metaData
 	}
-
-	return &buf, metaData
+	return buff, metaData
 }
 
 func writeHtmlFromMarkdown(p string, t string) {
