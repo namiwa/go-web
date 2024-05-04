@@ -41,10 +41,13 @@ func TestParseMarkdownCorrect(t *testing.T) {
 }
 
 func TestWriteHtmlFromMarkdown(t *testing.T) {
-	resultPath := "./fixtures/results.html"
+	resultName := "results.html"
+	f, err := os.CreateTemp("./fixtures", resultName)
+	assert.Nil(t, err)
+	defer f.Close()
 	testPath := "./fixtures/markdown_test.md"
-	writeHtmlFromMarkdown(testPath, resultPath)
-	resultsFile, err := os.ReadFile(resultPath)
+	writeHtmlFromMarkdown(testPath, f.Name())
+	resultsFile, err := os.ReadFile(f.Name())
 	assert.Nil(t, err)
 	referenceFile, err := os.ReadFile("./fixtures/markdown_test.html")
 	assert.Nil(t, err)
@@ -53,7 +56,10 @@ func TestWriteHtmlFromMarkdown(t *testing.T) {
 		string(resultsFile),
 		strings.ReplaceAll(string(referenceFile), "\r", ""), // windows carriage return removal
 	)
-	defer os.Remove(resultPath)
+	t.Cleanup(func() {
+		err = os.Remove(f.Name())
+		assert.Nil(t, err)
+	})
 }
 
 func TestParseMarkdownMissingFilePanic(t *testing.T) {

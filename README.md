@@ -4,8 +4,7 @@ A simple way to write static blog sites using markdown, written in Golang.
 
 This was done to reduce fatigue writing static sites using only JavaScript or TypeScript based frameworks.
 
-Hugo exist to solve this problem, but I want to to do something from scratch to really understand how a simple static site
-generator.
+Hugo exist to solve this problem, but I want to to do something from scratch to really understand how a simple static site generator can work.
 
 ## Roadmap
 
@@ -23,7 +22,7 @@ For version 1, the aim would be to have the following:
   - [x] add local filewatcher for hot-reload
   - [ ] unit & integration testing
 
-## BUGS
+## Bugs
 
 - [x] buildServe freezes the last item in memory, shows the same page despite different routes (did not handle loop closure in range)
 - [x] fsnotify does not seem to restart webserver (windows file saved as write, macos shows rename / create so reload fails, linux untested)
@@ -41,7 +40,7 @@ Enter frontend folder, with go version 1.22 minimally, and run `go build`, this 
 
 ## Notes
 
-- public directory is always ignored in this rep
+- public directory is always ignored in this repo
 
 ## References
 

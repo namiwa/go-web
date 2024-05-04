@@ -10,14 +10,16 @@ import (
 	"strings"
 )
 
+func isDir(p string) bool {
+	cp := path.Clean(p)
+	stat, err := os.Stat(cp)
+	return err == nil && stat.IsDir()
+}
+
 func validPath(p string) bool {
 	cp := path.Clean(p)
-	_, err := os.ReadDir(cp)
-	if err != nil {
-		infoLog("error reading dir path")
-		return false
-	}
-	return true
+	stat, err := os.Stat(cp)
+	return err == nil && !stat.IsDir()
 }
 
 func getFiles(p string) *[]fs.DirEntry {
@@ -35,6 +37,17 @@ func getFileNames(p string) []string {
 	return Map(*files, func(file fs.DirEntry) string {
 		return path.Join(cp, file.Name())
 	})
+}
+
+func replaceBaseExt(p string, ext string) string {
+	cp := path.Clean(p)
+	name := strings.TrimSuffix(cp, filepath.Ext(cp))
+	return strings.Join([]string{name, ".", ext}, "")
+}
+
+func makeDir(p string) {
+	cp := path.Clean(p)
+	os.MkdirAll(cp, fs.FileMode(0755))
 }
 
 /**
@@ -77,25 +90,8 @@ func writeToPath(buf bytes.Buffer, p string) {
 	if err != nil {
 		panic(err)
 	}
-	defer f.Close()
 	f.Write(buf.Bytes())
-}
-
-func replaceBaseExt(p string, ext string) string {
-	cp := path.Clean(p)
-	name := strings.TrimSuffix(cp, filepath.Ext(cp))
-	return strings.Join([]string{name, ".", ext}, "")
-}
-
-func isDir(p string) bool {
-	cp := path.Clean(p)
-	stat, err := os.Stat(cp)
-	return err == nil && stat.IsDir()
-}
-
-func makeDir(p string) {
-	cp := path.Clean(p)
-	os.MkdirAll(cp, fs.FileMode(0755))
+	defer f.Close()
 }
 
 func buildHtmlDirFromSource(p string, t string) error {
