@@ -18,8 +18,8 @@ func isDir(p string) bool {
 
 func validPath(p string) bool {
 	cp := path.Clean(p)
-	stat, err := os.Stat(cp)
-	return err == nil && !stat.IsDir()
+	_, err := os.Stat(cp)
+	return err == nil
 }
 
 func getFiles(p string) *[]fs.DirEntry {
@@ -30,6 +30,7 @@ func getFiles(p string) *[]fs.DirEntry {
 
 func getFileNames(p string) []string {
 	if !validPath(p) {
+		infoLog("invalid path, ", p, !validPath(p))
 		return nil
 	}
 	files := getFiles(p)
@@ -51,8 +52,7 @@ func makeDir(p string) {
 }
 
 /**
-* traverses all files & sub directories
-* TODO: insert injection markers for css / js here
+ * traverses all files & sub directories
  */
 func getFilePages(p string, store *[]Page) {
 	pages := getFileNames(p)
@@ -106,7 +106,6 @@ func buildHtmlDirFromSource(p string, t string) error {
 	if !isValidTarget {
 		makeDir(target)
 	} else {
-
 		err := os.RemoveAll(target)
 		if err != nil {
 			return err
@@ -115,6 +114,7 @@ func buildHtmlDirFromSource(p string, t string) error {
 	}
 
 	filesAndDirs := getFileNames(source)
+	infoLog("files: ", filesAndDirs)
 	for _, fileOrDir := range filesAndDirs {
 		targetPath := strings.Replace(fileOrDir, source, target, 1)
 		infoLog("diff files", fileOrDir, targetPath)
