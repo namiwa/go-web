@@ -5,7 +5,7 @@ title: A Lasting PC - Almost a decade
 category: computers
 ---
 
-### Have you owned any electronics devices that lasted for 9 years?
+## Have you owned any electronics devices that lasted for 9 years?
 
 Clearly, it is quite unique to be able to own an item for so long, and have it not break on you. It really is quite a feat for something to be chugging along day in and day out without any hiccups, and still able to be productive on some level.
 I am of course talking about my desktop PC, where it's been going strong since December of 2014. My first gaming rig so far, and for the past decade it has been with me through ups and downs.

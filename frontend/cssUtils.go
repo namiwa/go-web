@@ -18,6 +18,6 @@ func injectCssReset(buf *bytes.Buffer) *bytes.Buffer {
 		infoLog(err)
 		return nil
 	}
-	resetString := fmt.Sprintf("<head><style>%s</style></head>\n%s", string(data), buf.String())
+	resetString := fmt.Sprintf("<head>\n<style>%s</style>\n</head>\n%s", string(data), buf.String())
 	return bytes.NewBufferString(resetString)
 }

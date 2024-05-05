@@ -13,14 +13,17 @@ For version 1, the aim would be to have the following:
 - A single binary as a command line tool to parse markdown files and output html
   - [ ] simple templated index page
   - [ ] global injection for css / js
+    - [x] css reset added
+    - [ ] fix image routing - pass a static image folder duing build phase
   - [ ] custom override for single page css
-  - [ ] templating fragments of headers / footers
+  - [ ] templating fragments of headers / footers / navigation
   - [ ] easy seo integration
 - Dev server for listening / registering file changes from the MarkDown files
   - [x] two stage build, parse target dir to markdown
   - [x] serves via native go http package
   - [x] add local filewatcher for hot-reload
   - [ ] unit & integration testing
+    - [x] part 1 - file system + markdown parser
 
 ## Bugs
 
