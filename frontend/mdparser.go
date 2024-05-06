@@ -23,17 +23,15 @@ func validateHtml(data *bytes.Buffer) bool {
 	// https://stackoverflow.com/a/52410528/13941170
 	r := strings.NewReader(data.String())
 	d := xml.NewDecoder(r)
-
-	result := true
-
 	d.Strict = false
 	d.AutoClose = xml.HTMLAutoClose
 	d.Entity = xml.HTMLEntity
+
 	for {
 		_, err := d.Token()
 		switch err {
 		case io.EOF:
-			return result
+			return true
 		case nil:
 		default:
 			infoLog(err)

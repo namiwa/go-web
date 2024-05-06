@@ -15,6 +15,7 @@ For version 1, the aim would be to have the following:
   - [ ] global injection for css / js
     - [x] css reset added
     - [ ] fix image routing - pass a static image folder duing build phase
+    - [ ] landing page generation
   - [ ] custom override for single page css
   - [ ] templating fragments of headers / footers / navigation
   - [ ] easy seo integration

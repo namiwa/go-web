@@ -53,7 +53,7 @@ func TestWriteHtmlFromMarkdown(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(
 		t,
-		string(resultsFile),
+		strings.ReplaceAll(string(resultsFile), "\r", ""),
 		strings.ReplaceAll(string(referenceFile), "\r", ""), // windows carriage return removal
 	)
 	t.Cleanup(func() {
