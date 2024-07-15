@@ -8,6 +8,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	cp "github.com/otiai10/copy"
 )
 
 func isDir(p string) bool {
@@ -94,23 +96,32 @@ func writeToPath(buf bytes.Buffer, p string) {
 	defer f.Close()
 }
 
+func purgeDir(target string) error {
+	cleanedTarget := path.Clean(target)
+	if !isDir(cleanedTarget) {
+		makeDir(cleanedTarget)
+	} else {
+		err := os.RemoveAll(cleanedTarget)
+		if err != nil {
+			return err
+		}
+		makeDir(cleanedTarget)
+	}
+	return nil
+}
+
 func buildHtmlDirFromSource(p string, t string) error {
 	source := path.Clean(p)
 	target := path.Clean(t)
+
 	isValidSource := isDir(source)
-	isValidTarget := isDir(target)
 	if !isValidSource {
 		return errors.New("source must be a valid directory")
 	}
 
-	if !isValidTarget {
-		makeDir(target)
-	} else {
-		err := os.RemoveAll(target)
-		if err != nil {
-			return err
-		}
-		makeDir(target)
+	err := purgeDir(target)
+	if err != nil {
+		return err
 	}
 
 	filesAndDirs := getFileNames(source)
@@ -135,4 +146,41 @@ func buildHtmlDirFromSource(p string, t string) error {
 		}
 	}
 	return nil
+}
+
+func helperCopy(
+	source string,
+	target string,
+	skip func(srcinfo os.FileInfo, src, dest string) (bool, error),
+) error {
+	return cp.Copy(
+		source,
+		target,
+		cp.Options{
+			OnSymlink: func(src string) cp.SymlinkAction {
+				return cp.Skip
+			},
+			OnDirExists: func(src, dest string) cp.DirExistsAction {
+				return cp.Merge
+			},
+			Skip: skip,
+			Sync: true,
+		},
+	)
+}
+
+func copy(src string, dest string) error {
+	cleanSrc := path.Clean(src)
+	if !isDir(cleanSrc) {
+		return errors.New("invalid Source Directory")
+	}
+	cleanDest := path.Clean(dest)
+	if !isDir(cleanDest) {
+		return errors.New("invalid Destination Directory")
+	}
+	err := purgeDir(dest)
+	if err != nil {
+		return err
+	}
+	return helperCopy(cleanSrc, cleanDest, nil)
 }

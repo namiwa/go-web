@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func build(source *string, target *string) {
+func build(source *string, target *string, assest *string) {
 	infoLog("Starting main markdown parser")
 	err := buildHtmlDirFromSource(*source, *target)
 	if err == nil {
@@ -41,7 +41,9 @@ func main() {
 	cmd := flag.String("cmd", "", "go-web command: build, serve or buildServe")
 	source := flag.String("source", "", "source directory of markdown")
 	target := flag.String("target", "", "target output directory of htmls")
+	assets := flag.String("assets", "", "assets path")
 	flag.Parse()
+
 	switch *cmd {
 	case "build":
 		{
