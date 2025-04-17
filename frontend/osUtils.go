@@ -48,9 +48,13 @@ func replaceBaseExt(p string, ext string) string {
 	return strings.Join([]string{name, ".", ext}, "")
 }
 
-func makeDir(p string) {
+func makeDir(p string) error {
 	cp := path.Clean(p)
-	os.MkdirAll(cp, fs.FileMode(0755))
+	err := os.MkdirAll(cp, fs.FileMode(0755))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 /**
@@ -183,4 +187,19 @@ func copy(src string, dest string) error {
 		return err
 	}
 	return helperCopy(cleanSrc, cleanDest, nil)
+}
+
+func copy_assets(src string, dest string) error {
+	fullDest := path.Join(dest, "_assets")
+	err := makeDir(fullDest)
+	if err != nil {
+		return err
+	}
+
+	err = copy(src, fullDest)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
