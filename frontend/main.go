@@ -13,6 +13,12 @@ func build(source *string, target *string, assets *string) {
 		os.Exit(1)
 	}
 
+	if *assets == "" {
+		// if default value, throw error
+		infoLog("asset dir cannot be empty")
+		os.Exit(1)
+	}
+
 	err = copy_assets(*assets, *target)
 	if err != nil {
 		infoLog("failed to create asset dir")
