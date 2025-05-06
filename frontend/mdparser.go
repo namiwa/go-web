@@ -8,6 +8,7 @@ import (
 	"path"
 	"strings"
 
+	img64 "github.com/tenkoh/goldmark-img64"
 	"github.com/yuin/goldmark"
 	meta "github.com/yuin/goldmark-meta"
 	"github.com/yuin/goldmark/extension"
@@ -23,17 +24,15 @@ func validateHtml(data *bytes.Buffer) bool {
 	// https://stackoverflow.com/a/52410528/13941170
 	r := strings.NewReader(data.String())
 	d := xml.NewDecoder(r)
-
-	result := true
-
 	d.Strict = false
 	d.AutoClose = xml.HTMLAutoClose
 	d.Entity = xml.HTMLEntity
+
 	for {
 		_, err := d.Token()
 		switch err {
 		case io.EOF:
-			return result
+			return true
 		case nil:
 		default:
 			infoLog(err)
@@ -44,10 +43,12 @@ func validateHtml(data *bytes.Buffer) bool {
 }
 
 func initMarkdownParser() func() goldmark.Markdown {
+	images := "../website/blog/images"
 	md := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,
 			meta.Meta,
+			img64.Img64,
 		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
@@ -55,6 +56,7 @@ func initMarkdownParser() func() goldmark.Markdown {
 		goldmark.WithRendererOptions(
 			html.WithHardWraps(),
 			html.WithXHTML(),
+			img64.WithPathResolver(img64.ParentLocalPathResolver(images)),
 		),
 	)
 	return func() goldmark.Markdown {
@@ -81,11 +83,11 @@ func parseMarkdownFile(p string) (*bytes.Buffer, map[string]interface{}) {
 	}
 	metaData := meta.Get(context)
 	infoLog("parseMarkdownFile: ", metaData)
-	if !validateHtml(&buf) {
+	buff := injectCssReset(&buf)
+	if !validateHtml(buff) {
 		return nil, metaData
 	}
-
-	return &buf, metaData
+	return buff, metaData
 }
 
 func writeHtmlFromMarkdown(p string, t string) {

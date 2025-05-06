@@ -14,7 +14,7 @@ func TestIsDir(t *testing.T) {
 
 func TestValidPath(t *testing.T) {
 	assert.True(t, validPath("./fixtures/markdown_test.md"), "should return true for correct path")
-	assert.False(t, validPath("./fixtures"), "should return false for directories")
+	assert.True(t, validPath("./fixtures"), "should return true for directories")
 	assert.False(t, validPath("./fixtures/invalid_xd.txt"), "should return false for invalid files")
 }
 

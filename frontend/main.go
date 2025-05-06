@@ -5,16 +5,28 @@ import (
 	"os"
 )
 
-func build(source *string, target *string) {
+func build(source *string, target *string, assets *string) {
 	infoLog("Starting main markdown parser")
 	err := buildHtmlDirFromSource(*source, *target)
-	if err == nil {
-		infoLog("successfully converted markdown to html")
-		os.Exit(0)
-	} else {
+	if err != nil {
 		infoLog("failed to read files")
 		os.Exit(1)
 	}
+
+	if *assets == "" {
+		// if default value, throw error
+		infoLog("asset dir cannot be empty")
+		os.Exit(1)
+	}
+
+	err = copy_assets(*assets, *target)
+	if err != nil {
+		infoLog("failed to create asset dir")
+		os.Exit(1)
+	}
+
+	infoLog("successfully converted markdown to html")
+	os.Exit(0)
 }
 
 func serve(target *string) {
@@ -41,7 +53,9 @@ func main() {
 	cmd := flag.String("cmd", "", "go-web command: build, serve or buildServe")
 	source := flag.String("source", "", "source directory of markdown")
 	target := flag.String("target", "", "target output directory of htmls")
+	assets := flag.String("assets", "", "assets path")
 	flag.Parse()
+
 	switch *cmd {
 	case "build":
 		{
@@ -53,7 +67,7 @@ func main() {
 				infoLog("empty target directory")
 				os.Exit(1)
 			}
-			build(source, target)
+			build(source, target, assets)
 		}
 	case "serve":
 		{

@@ -1,5 +1,4 @@
-<head>
-<style>/*
+/*
   Josh's Custom CSS Reset
   https://www.joshwcomeau.com/css/custom-css-reset/
   Accessed on 5/5/2024
@@ -29,7 +28,4 @@ p, h1, h2, h3, h4, h5, h6 {
 }
 #root, #__next {
   isolation: isolate;
-}</style>
-</head>
-<h1 id="this-is-a-test">This is a test!</h1>
-<p>Yes its a test hehe</p>
+}
