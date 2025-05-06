@@ -40,7 +40,7 @@ Enter frontend folder, with go version 1.22 minimally, and run `go build`, this 
 - building: `./frontend -cmd=build -source=<target_markdown_folder> -target=<output_folder>`
 - serving: `./frontend serve -target=<output_folder>` (only serves html for now)
 - watch serve: `./frontend --cmd devStart --target ../website/blog`
-- watch build: `./frontend --cmd devServe --target ../website/blog`
+- watch build: `./frontend --cmd devServe --target ../website/blog --assets ../website/blog/images`
 
 ## Notes
 

@@ -191,6 +191,13 @@ func copy(src string, dest string) error {
 
 func copy_assets(src string, dest string) error {
 	fullDest := path.Join(dest, "_assets")
+	if isDir(fullDest) {
+		err := purgeDir(fullDest)
+		if err != nil {
+			return err
+		}
+	}
+
 	err := makeDir(fullDest)
 	if err != nil {
 		return err

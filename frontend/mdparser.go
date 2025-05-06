@@ -8,6 +8,7 @@ import (
 	"path"
 	"strings"
 
+	img64 "github.com/tenkoh/goldmark-img64"
 	"github.com/yuin/goldmark"
 	meta "github.com/yuin/goldmark-meta"
 	"github.com/yuin/goldmark/extension"
@@ -42,10 +43,12 @@ func validateHtml(data *bytes.Buffer) bool {
 }
 
 func initMarkdownParser() func() goldmark.Markdown {
+	images := "../website/blog/images"
 	md := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,
 			meta.Meta,
+			img64.Img64,
 		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
@@ -53,6 +56,7 @@ func initMarkdownParser() func() goldmark.Markdown {
 		goldmark.WithRendererOptions(
 			html.WithHardWraps(),
 			html.WithXHTML(),
+			img64.WithPathResolver(img64.ParentLocalPathResolver(images)),
 		),
 	)
 	return func() goldmark.Markdown {
